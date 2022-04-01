@@ -1,0 +1,26 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "c4ff369d-04ef-4ba3-af75-8385324a6774": {
+      "ProjectGuid": "c4ff369d-04ef-4ba3-af75-8385324a6774",
+      "DisplayName": "authUsers",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    },
+    "ec6b9e98-bd8c-4efb-b5fe-e4ee933fd6f9": {
+      "ProjectGuid": "ec6b9e98-bd8c-4efb-b5fe-e4ee933fd6f9",
+      "DisplayName": "Application",
+      "ColorIndex": 1
+    },
+    "7f8579d3-468e-4010-8fad-0144fbda7461": {
+      "ProjectGuid": "7f8579d3-468e-4010-8fad-0144fbda7461",
+      "DisplayName": "Infra",
+      "ColorIndex": 2
+    }
+  },
+  "NextColorIndex": 3
+}

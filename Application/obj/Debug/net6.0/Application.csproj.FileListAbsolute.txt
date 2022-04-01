@@ -1,0 +1,28 @@
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.AssemblyInfoInputs.cache
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.AssemblyInfo.cs
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\PFE\Application\bin\Debug\net6.0\Application.deps.json
+C:\Users\Lenovo\Desktop\PFE\Application\bin\Debug\net6.0\Application.runtimeconfig.json
+C:\Users\Lenovo\Desktop\PFE\Application\bin\Debug\net6.0\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Application\bin\Debug\net6.0\ref\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Application\bin\Debug\net6.0\Application.pdb
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\ref\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.pdb
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.genruntimeconfig.cache
+C:\Users\Lenovo\Desktop\PFE\Application\obj\Debug\net6.0\Application.csproj.AssemblyReference.cache
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\bin\Debug\net6.0\Application.deps.json
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\bin\Debug\net6.0\Application.runtimeconfig.json
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\bin\Debug\net6.0\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\bin\Debug\net6.0\ref\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\bin\Debug\net6.0\Application.pdb
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.csproj.AssemblyReference.cache
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.AssemblyInfoInputs.cache
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.AssemblyInfo.cs
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\ref\Application.dll
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.pdb
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Application\obj\Debug\net6.0\Application.genruntimeconfig.cache
