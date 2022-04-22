@@ -2,7 +2,7 @@
 {
     public class UserDTO
     {
-        public UserDTO(string id, string fullName, string userName, string email, string phoneNumber, string adresse, string role)
+        public UserDTO(string id, string fullName, string userName, string email, string phoneNumber, string adresse, string role )
         {
             Id = id;
             FullName = fullName;
@@ -11,7 +11,7 @@
             PhoneNumber = phoneNumber;
             Adresse = adresse;
             Role = role;
-        }
+    }
 
         public string Id { get; set; }
 

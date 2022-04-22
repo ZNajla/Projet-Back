@@ -6,5 +6,6 @@ namespace Application.Models
     {
         public string FullName { get; set; } = String.Empty;
         public string Adresse { get; set; } = String.Empty;
+        
     }
 }

@@ -18,7 +18,6 @@ C:\Users\Lenovo\Desktop\PFE\Infra\obj\Debug\net6.0\Infra.csproj.CopyComplete
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\Infra.deps.json
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\Infra.runtimeconfig.json
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\Infra.dll
-C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\ref\Infra.dll
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\Infra.pdb
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\Application.dll
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\bin\Debug\net6.0\Application.pdb
@@ -32,3 +31,4 @@ C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.dll
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\ref\Infra.dll
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.pdb
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.genruntimeconfig.cache
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\refint\Infra.dll
