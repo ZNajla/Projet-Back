@@ -1,7 +1,9 @@
 ﻿using Application.Configuration;
 using Application.Models.DTO;
-using Application.Models;
+using Application.Models.Entitys;
 using Application.Models.Enums;
+using Application.Models.Request;
+using Application.Models.Responce;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +60,7 @@ namespace authUsers.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("GetAllRoles")]
         public async Task<object> GetAllRoles()
         {

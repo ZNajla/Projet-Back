@@ -11,7 +11,7 @@
             PhoneNumber = phoneNumber;
             Adresse = adresse;
             Role = role;
-    }
+        }
 
         public string Id { get; set; }
 

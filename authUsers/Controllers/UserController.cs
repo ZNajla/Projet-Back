@@ -6,10 +6,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Application.Models;
+using Application.Models.Entitys;
 using Application.Models.DTO;
 using Application.Configuration;
 using Application.Models.Enums;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Application.Models.Request;
+using Application.Models.Responce;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,13 +34,16 @@ namespace authUsers.Controllers
 
         private readonly JWTConfig _jWTConfig;
 
-        public UserController(ILogger<UserController> logger, UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTConfig> jwtConfig, RoleManager<IdentityRole> roleManager)
+        private readonly MailSettings _mailSettings;
+
+        public UserController(ILogger<UserController> logger, UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTConfig> jwtConfig, RoleManager<IdentityRole> roleManager , IOptions<MailSettings> mailSettings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _logger = logger;
             _jWTConfig = jwtConfig.Value;
+            _mailSettings = mailSettings.Value;
         }
 
         //[Authorize(Roles = "Admin")]
@@ -57,6 +65,8 @@ namespace authUsers.Controllers
                         var tempUser = await _userManager.FindByEmailAsync(model.Email);
                         await _userManager.AddToRoleAsync(tempUser, model.Role);
                     }
+                    var mailRequest = new MailRequest(model.Email, "Welcome", "Email : " + model.Email + " Password : " + model.Password);
+                    SendEmailAsync(mailRequest);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User Has been Added", null));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "", result.Errors.Select(x => x.Description).ToArray()));
@@ -224,6 +234,29 @@ namespace authUsers.Controllers
             };
             var token = jwtTokenHandler.CreateToken(tokenDescreptor);
             return jwtTokenHandler.WriteToken(token);
+        }
+
+        [HttpPost("Send")]
+        public async Task<object> SendEmailAsync(MailRequest mailRequest)
+        {
+            var email = new MimeMessage();
+            if(email != null)
+            {
+                email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+                email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
+                email.Subject = mailRequest.Subject;
+                var builder = new BodyBuilder();
+                builder.HtmlBody = mailRequest.Body;
+                email.Body = builder.ToMessageBody();
+                using var smtp = new SmtpClient();
+                smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+                smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+                await smtp.SendAsync(email);
+                smtp.Disconnect(true);
+                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Email has been send", null));
+            }
+            return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something wrong", null));
         }
     }
 }

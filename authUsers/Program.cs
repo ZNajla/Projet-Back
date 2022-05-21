@@ -1,11 +1,13 @@
 using Infra.Data;
-using Application.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application.Configuration;
+using Application.Models.Request;
+using Application.Models.Entitys;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("strConnection");
@@ -17,6 +19,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddDbContext<AuthDbContext>(option =>
 {
@@ -33,6 +37,9 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
         });
 });
+
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddIdentity<User, IdentityRole>(option => { }).AddEntityFrameworkStores<AuthDbContext>();
 
@@ -70,6 +77,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("_myAllowSpecificOrigins");
 app.UseAuthentication();
+
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
