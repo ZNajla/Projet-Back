@@ -7,7 +7,7 @@ namespace Infra.Data
 {
     public class AuthDbContext : IdentityDbContext<User, IdentityRole, string>
     {
-        public AuthDbContext(DbContextOptions options) : base(options)
+        public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
         {
             
         }
@@ -17,6 +17,8 @@ namespace Infra.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Step>()
                 .HasKey(c => new { c.UserId, c.DocumentId });
+            modelBuilder.Entity<Detail_Processus>()
+                .HasKey(c => new { c.UserId, c.ProcessusId });
         }
 
         public DbSet<Document> Documents { get; set; }

@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Application.Models.Entitys
 {
     public class Document
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ID { get; set; }
+        public Guid ID { get; set; }
 
         public string Url { get; set; }
 

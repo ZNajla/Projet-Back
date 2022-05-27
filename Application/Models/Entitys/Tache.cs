@@ -5,7 +5,7 @@ namespace Application.Models.Entitys
     public class Tache
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ID { get; set; }
+        public Guid ID { get; set; }
 
         public string Nom { get; set; }
 

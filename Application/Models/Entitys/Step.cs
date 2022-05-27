@@ -16,11 +16,11 @@ namespace Application.Models.Entitys
         public string Commentaire { get; set; }
 
         [Key]
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public User User { get; set; }
 
         [Key]
-        public string DocumentId { get; set; }
+        public Guid DocumentId { get; set; }
         public Document Document { get; set; }
     }
 }

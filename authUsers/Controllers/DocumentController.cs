@@ -44,12 +44,12 @@ namespace authUsers.Controllers
                         var user = new UserDTO(doc.User.Id, doc.User.FullName, doc.User.UserName, doc.User.Email, doc.User.PhoneNumber, doc.User.Adresse, role);
                         if(doc.Types == null)
                         {
-                            var docu = new DocumentDTO(doc.ID, doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user,"" , doc.DateUpdate);
+                            var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user,"" , doc.DateUpdate);
                             allDocument.Add(docu);
                         }
                         else
                         {
-                            var docu = new DocumentDTO(doc.ID, doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
+                            var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
                             allDocument.Add(docu);
                         }
                         
@@ -74,7 +74,7 @@ namespace authUsers.Controllers
                 if (ModelState.IsValid)
                 {
                     var user = _userManager.Users.FirstOrDefault(u => u.Id == doc.UserId);
-                    var types = _context.Types.FirstOrDefault(u => u.ID == doc.TypesId);
+                    var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(doc.TypesId));
                     var document = new Document() { Url = doc.Url, Reference = doc.Reference,  Titre = doc.Titre,
                         NbPage = doc.NbPage, MotCle = doc.MotCle, Version = doc.Version, Date = DateTime.Now , User = user, Types = types , DateUpdate = DateTime.Now};
                     var result = _context.Documents.Add(document);
@@ -95,19 +95,19 @@ namespace authUsers.Controllers
         {
             try
             {
-                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID == id);
+                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID.ToString().Equals(id));
                 if (doc != null)
                 {
                     var role = (await _userManager.GetRolesAsync(doc.User)).FirstOrDefault();
                     var user = new UserDTO(doc.User.Id, doc.User.FullName, doc.User.UserName, doc.User.Email, doc.User.PhoneNumber, doc.User.Adresse, role);
                     if (doc.Types == null)
                     {
-                        var docu = new DocumentDTO(doc.ID, doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, "" , doc.DateUpdate);
+                        var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, "" , doc.DateUpdate);
                         return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docu));
                     }
                     else
                     {
-                        var docu = new DocumentDTO(doc.ID, doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
+                        var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
                         return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docu));
                     }
                     
@@ -126,10 +126,10 @@ namespace authUsers.Controllers
         {
             try
             {
-                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID == id);
+                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID.ToString().Equals(id));
                 if (doc != null)
                 {
-                    var types = _context.Types.FirstOrDefault(u => u.ID == document.TypesId);
+                    var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(document.TypesId));
                     doc.Reference = document.Reference;
                     doc.Titre = document.Titre;
                     doc.NbPage = document.NbPage;
@@ -154,7 +154,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var doc = _context.Documents.FirstOrDefault(u => u.ID == id);
+                var doc = _context.Documents.FirstOrDefault(u => u.ID.ToString().Equals(id));
                 if (doc != null)
                 {
                     _context.Documents.Remove(doc);

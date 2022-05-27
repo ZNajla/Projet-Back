@@ -20,6 +20,8 @@ namespace authUsers.Controllers
 
         private readonly UserManager<User> _userManager;
 
+        private Controllers.DetailProcessController _detailProcessController;   
+
         public ProcessusController(UserManager<User> userManager, AuthDbContext authDbContext)
         {
             _context = authDbContext;
@@ -34,17 +36,14 @@ namespace authUsers.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var types = _context.Types.FirstOrDefault(u => u.ID == proc.Types);
                     var processus = new Processus()
                     {
                         NomProcessus = proc.NomProcessus,
                         Description = proc.Description,
-                        Date_debut = DateTime.Now,
-                        Date_fin = proc.Date_fin,
-                        Types = types,
                     };
-                    var result = _context.Processus.Add(processus);
-                    var entries = await _context.SaveChangesAsync();
+                    _context.Processus.Add(processus);
+                    await _context.SaveChangesAsync();
+                   // _detailProcessController.AddDetailProcess(proc.Detail_Processus);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Process has been added successfully", null));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
@@ -63,24 +62,25 @@ namespace authUsers.Controllers
             try
             {
                 List<ProcessusDTO> allProcessus = new List<ProcessusDTO>();
-                var processus = await _context.Processus.Include(b => b.Types).ToListAsync();
+                var processus = await _context.Processus.Include(b => b.Detail_Processus).ToListAsync();
                 if (processus.Count != 0)
                 {
-                    foreach (Processus pro in processus)
-                    {
-                        if (pro.Types == null)
-                        {
-                            var proc = new ProcessusDTO(pro.NomProcessus,pro.Description,pro.Date_debut,pro.Date_fin,"");
-                            allProcessus.Add(proc);
-                        }
-                        else
-                        {
-                            var proc = new ProcessusDTO(pro.NomProcessus, pro.Description, pro.Date_debut, pro.Date_fin, pro.Types.Nom);
-                            allProcessus.Add(proc);
-                        }
+                   // foreach (Processus pro in processus)
+                    //{
+                      //  if (pro.Types == null)
+                       // {
 
-                    }
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allProcessus));
+                           // var proc = new ProcessusDTO(pro.NomProcessus,pro.Description,pro.Date_debut,pro.Date_fin,"");
+                           // allProcessus.Add(proc);
+                       // }
+                       // else
+                       // {
+                         //   var proc = new ProcessusDTO(pro.NomProcessus, pro.Description, pro.Date_debut, pro.Date_fin, pro.Types.Nom);
+                          //  allProcessus.Add(proc);
+                        //}
+
+                   // }
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", processus));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", allProcessus));
             }
@@ -96,17 +96,17 @@ namespace authUsers.Controllers
         {
             try
             {
-                var proc = await _context.Processus.Include(b => b.Types).FirstOrDefaultAsync(u => u.Id == id);
+                var proc = await _context.Processus.Include(b => b.Types).FirstOrDefaultAsync(u => u.Id.ToString().Equals(id));
                 if (proc != null)
                 {
                     if (proc.Types == null)
                     {
-                        var procu = new ProcessusDTO(proc.NomProcessus ,proc.Description ,proc.Date_debut,proc.Date_fin ,"");
+                        var procu = new ProcessusDTO(proc.NomProcessus ,proc.Description);
                         return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", procu));
                     }
                     else
                     {
-                        var procu = new ProcessusDTO(proc.NomProcessus, proc.Description, proc.Date_debut, proc.Date_fin, proc.Types.Nom);
+                        var procu = new ProcessusDTO(proc.NomProcessus, proc.Description);
                         return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", procu));
                     }
 
@@ -127,15 +127,11 @@ namespace authUsers.Controllers
         {
             try
             {
-                var proc = _context.Processus.FirstOrDefault(u => u.Id == id);
+                var proc = _context.Processus.FirstOrDefault(u => u.Id.ToString().Equals(id));
                 if (proc != null)
                 {
-                    var types = _context.Types.FirstOrDefault(u => u.ID == process.Types);
                     proc.NomProcessus = process.NomProcessus;
                     proc.Description = process.Description;
-                    proc.Date_debut = process.Date_debut;
-                    proc.Date_fin = process.Date_fin;
-                    proc.Types = types;
                     await _context.SaveChangesAsync();
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Processus has been updated", null));
                 }
@@ -153,7 +149,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var proc = _context.Processus.FirstOrDefault(u => u.Id == id);
+                var proc = _context.Processus.FirstOrDefault(u => u.Id.ToString().Equals(id));
                 if (proc != null)
                 {
                     _context.Processus.Remove(proc);

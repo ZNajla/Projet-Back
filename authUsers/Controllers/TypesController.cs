@@ -27,7 +27,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var types = _context.Types.Select(x => x.Nom).ToList();
+                var types = _context.Types.ToList();
                 if (types.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", types));
@@ -67,7 +67,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var type = _context.Types.FirstOrDefault(u => u.ID == id);
+                var type = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(id));
                 if (type != null)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", type.Nom));
@@ -86,7 +86,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var type = _context.Types.FirstOrDefault(u => u.ID == id);
+                var type = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(id));
                 if (type != null)
                 {
                     _context.Types.Remove(type);

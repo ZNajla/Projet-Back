@@ -12,18 +12,10 @@ namespace Application.Models.DTO
 
         public string Description { get; set; }
 
-        public DateTime Date_debut { get; set; }
-
-        public DateTime Date_fin { get; set; }
-
-        public string Types { get; set; }
-
-        public ProcessusDTO(string nomProcessus, string description, DateTime date_debut, DateTime date_fin, string types)        {
+        public ProcessusDTO(string nomProcessus, string description)
+        {
             NomProcessus = nomProcessus;
             Description = description;
-            Date_debut = date_debut;
-            Date_fin = date_fin;
-            Types = types;
         }   
 
     }

@@ -9,5 +9,7 @@ namespace Application.Models.Request
     public class AddUpdateTypes
     {
         public string Nom { get; set; }
+
+        public string ProcessId { get; set; }
     }
 }

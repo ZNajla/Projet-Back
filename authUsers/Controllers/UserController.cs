@@ -65,7 +65,7 @@ namespace authUsers.Controllers
                         var tempUser = await _userManager.FindByEmailAsync(model.Email);
                         await _userManager.AddToRoleAsync(tempUser, model.Role);
                     }
-                    var mailRequest = new MailRequest(model.Email, "Welcome", "Email : " + model.Email + " Password : " + model.Password);
+                    var mailRequest = new MailRequest(model.Email, "Welcome", "Email : " + model.Email + " Password : " + model.Password,null);
                     SendEmailAsync(mailRequest);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User Has been Added", null));
                 }
@@ -246,6 +246,22 @@ namespace authUsers.Controllers
                 email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
                 email.Subject = mailRequest.Subject;
                 var builder = new BodyBuilder();
+                if (mailRequest.Attachments != null)
+                {
+                    byte[] fileBytes;
+                    foreach (var file in mailRequest.Attachments)
+                    {
+                        if (file.Length > 0)
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                file.CopyTo(ms);
+                                fileBytes = ms.ToArray();
+                            }
+                            builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                        }
+                    }
+                }
                 builder.HtmlBody = mailRequest.Body;
                 email.Body = builder.ToMessageBody();
                 using var smtp = new SmtpClient();

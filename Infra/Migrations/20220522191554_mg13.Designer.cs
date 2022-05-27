@@ -3,16 +3,18 @@ using System;
 using Infra.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace authUsers.Migrations
+namespace Infra.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220522191554_mg13")]
+    partial class mg13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,10 +23,8 @@ namespace authUsers.Migrations
 
             modelBuilder.Entity("Application.Models.Entitys.Detail_Processus", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ProcessusId")
+                    b.Property<string>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Action")
@@ -39,14 +39,24 @@ namespace authUsers.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("ProcessusId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.Property<int>("Step")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "ProcessusId");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("ID");
 
                     b.HasIndex("ProcessusId");
 
-                    b.ToTable("Detail_Processus", (string)null);
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Detail_Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Document", b =>
@@ -96,7 +106,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Documents", (string)null);
+                    b.ToTable("Documents");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
@@ -126,7 +136,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("TypesID");
 
-                    b.ToTable("Processus", (string)null);
+                    b.ToTable("Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Step", b =>
@@ -153,7 +163,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("DocumentId");
 
-                    b.ToTable("Steps", (string)null);
+                    b.ToTable("Steps");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Tache", b =>
@@ -182,7 +192,7 @@ namespace authUsers.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Taches", (string)null);
+                    b.ToTable("Taches");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
@@ -197,7 +207,7 @@ namespace authUsers.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Types", (string)null);
+                    b.ToTable("Types");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.User", b =>
@@ -412,7 +422,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("TacheUser", (string)null);
+                    b.ToTable("TacheUser");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Detail_Processus", b =>

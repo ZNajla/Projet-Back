@@ -3,16 +3,18 @@ using System;
 using Infra.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace authUsers.Migrations
+namespace Infra.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220522204810_mg14")]
+    partial class mg14
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,7 +48,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("ProcessusId");
 
-                    b.ToTable("Detail_Processus", (string)null);
+                    b.ToTable("Detail_Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Document", b =>
@@ -96,7 +98,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Documents", (string)null);
+                    b.ToTable("Documents");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
@@ -126,7 +128,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("TypesID");
 
-                    b.ToTable("Processus", (string)null);
+                    b.ToTable("Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Step", b =>
@@ -153,7 +155,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("DocumentId");
 
-                    b.ToTable("Steps", (string)null);
+                    b.ToTable("Steps");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Tache", b =>
@@ -182,7 +184,7 @@ namespace authUsers.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Taches", (string)null);
+                    b.ToTable("Taches");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
@@ -197,7 +199,7 @@ namespace authUsers.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Types", (string)null);
+                    b.ToTable("Types");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.User", b =>
@@ -412,7 +414,7 @@ namespace authUsers.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("TacheUser", (string)null);
+                    b.ToTable("TacheUser");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Detail_Processus", b =>
