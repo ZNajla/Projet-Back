@@ -13,6 +13,6 @@ namespace Application.Models.Entitys
 
         public virtual ICollection<Types> Types { get; set; }
 
-        public ICollection<Detail_Processus> Detail_Processus { get; set; }
+        public virtual ICollection<Detail_Processus> Detail_Processus { get; set; }
     }
 }

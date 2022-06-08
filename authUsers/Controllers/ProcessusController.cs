@@ -43,8 +43,8 @@ namespace authUsers.Controllers
                     };
                     _context.Processus.Add(processus);
                     await _context.SaveChangesAsync();
-                   // _detailProcessController.AddDetailProcess(proc.Detail_Processus);
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Process has been added successfully", null));
+                    var insertedProcess = processus.Id;
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Process has been added successfully", insertedProcess));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -65,21 +65,11 @@ namespace authUsers.Controllers
                 var processus = await _context.Processus.Include(b => b.Detail_Processus).ToListAsync();
                 if (processus.Count != 0)
                 {
-                   // foreach (Processus pro in processus)
-                    //{
-                      //  if (pro.Types == null)
-                       // {
-
-                           // var proc = new ProcessusDTO(pro.NomProcessus,pro.Description,pro.Date_debut,pro.Date_fin,"");
-                           // allProcessus.Add(proc);
-                       // }
-                       // else
-                       // {
-                         //   var proc = new ProcessusDTO(pro.NomProcessus, pro.Description, pro.Date_debut, pro.Date_fin, pro.Types.Nom);
-                          //  allProcessus.Add(proc);
-                        //}
-
-                   // }
+                    foreach (Processus pro in processus)
+                    {
+                        var proc = new ProcessusDTO(pro.NomProcessus,pro.Description);
+                        allProcessus.Add(proc);
+                    }
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", processus));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", allProcessus));
@@ -96,22 +86,22 @@ namespace authUsers.Controllers
         {
             try
             {
-                var proc = await _context.Processus.Include(b => b.Types).FirstOrDefaultAsync(u => u.Id.ToString().Equals(id));
-                if (proc != null)
-                {
+                 var proc = await _context.Processus.Include(b => b.Detail_Processus).FirstOrDefaultAsync(u => u.Id.ToString().Equals(id));
+                 if (proc != null)
+                 {
                     if (proc.Types == null)
                     {
                         var procu = new ProcessusDTO(proc.NomProcessus ,proc.Description);
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", procu));
+                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", proc));
                     }
                     else
                     {
                         var procu = new ProcessusDTO(proc.NomProcessus, proc.Description);
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", procu));
+                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", proc));
                     }
 
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+                 }
+                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
             catch (Exception ex)
             {
@@ -133,7 +123,7 @@ namespace authUsers.Controllers
                     proc.NomProcessus = process.NomProcessus;
                     proc.Description = process.Description;
                     await _context.SaveChangesAsync();
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Processus has been updated", null));
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Processus has been updated", proc));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Processus does not exist", null));
             }

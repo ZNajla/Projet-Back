@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Models.DTO;
 
 namespace Application.Models.Request
 {
@@ -16,7 +12,7 @@ namespace Application.Models.Request
 
         public string Commentaire { get; set; }
 
-        public string UserId { get; set; }
+        public string User { get; set; }
 
         public string ProcessusId { get; set; }
     }

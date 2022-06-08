@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace authUsers.Migrations
+namespace Infra.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
     partial class AuthDbContextModelSnapshot : ModelSnapshot
@@ -24,8 +24,8 @@ namespace authUsers.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("ProcessusId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("ProcessusId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Action")
                         .IsRequired()
@@ -46,14 +46,14 @@ namespace authUsers.Migrations
 
                     b.HasIndex("ProcessusId");
 
-                    b.ToTable("Detail_Processus", (string)null);
+                    b.ToTable("Detail_Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Document", b =>
                 {
-                    b.Property<string>("ID")
+                    b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
@@ -76,8 +76,8 @@ namespace authUsers.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TypesID")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("TypesID")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -96,20 +96,14 @@ namespace authUsers.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Documents", (string)null);
+                    b.ToTable("Documents");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("Date_debut")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("Date_fin")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -119,14 +113,9 @@ namespace authUsers.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TypesID")
-                        .HasColumnType("varchar(255)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("TypesID");
-
-                    b.ToTable("Processus", (string)null);
+                    b.ToTable("Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Step", b =>
@@ -134,70 +123,37 @@ namespace authUsers.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("DocumentId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Commentaire")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("NumStep")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("date_debut")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("UserId", "DocumentId");
 
                     b.HasIndex("DocumentId");
 
-                    b.ToTable("Steps", (string)null);
-                });
-
-            modelBuilder.Entity("Application.Models.Entitys.Tache", b =>
-                {
-                    b.Property<string>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("DateDebut")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DateFin")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Etat")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Taches", (string)null);
+                    b.ToTable("Steps");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
                 {
-                    b.Property<string>("ID")
+                    b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Nom")
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<Guid>("ProcessusId")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("ID");
 
-                    b.ToTable("Types", (string)null);
+                    b.HasIndex("ProcessusId");
+
+                    b.ToTable("Types");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.User", b =>
@@ -400,21 +356,6 @@ namespace authUsers.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TacheUser", b =>
-                {
-                    b.Property<string>("TachesID")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("TachesID", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("TacheUser", (string)null);
-                });
-
             modelBuilder.Entity("Application.Models.Entitys.Detail_Processus", b =>
                 {
                     b.HasOne("Application.Models.Entitys.Processus", "Processus")
@@ -438,7 +379,9 @@ namespace authUsers.Migrations
                 {
                     b.HasOne("Application.Models.Entitys.Types", "Types")
                         .WithMany("Documents")
-                        .HasForeignKey("TypesID");
+                        .HasForeignKey("TypesID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Application.Models.Entitys.User", "User")
                         .WithMany("Documents")
@@ -447,15 +390,6 @@ namespace authUsers.Migrations
                     b.Navigation("Types");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
-                {
-                    b.HasOne("Application.Models.Entitys.Types", "Types")
-                        .WithMany("Processus")
-                        .HasForeignKey("TypesID");
-
-                    b.Navigation("Types");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Step", b =>
@@ -475,6 +409,17 @@ namespace authUsers.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Application.Models.Entitys.Types", b =>
+                {
+                    b.HasOne("Application.Models.Entitys.Processus", "Processus")
+                        .WithMany("Types")
+                        .HasForeignKey("ProcessusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Processus");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -528,21 +473,6 @@ namespace authUsers.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TacheUser", b =>
-                {
-                    b.HasOne("Application.Models.Entitys.Tache", null)
-                        .WithMany()
-                        .HasForeignKey("TachesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Application.Models.Entitys.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Application.Models.Entitys.Document", b =>
                 {
                     b.Navigation("Steps");
@@ -551,13 +481,13 @@ namespace authUsers.Migrations
             modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
                 {
                     b.Navigation("Detail_Processus");
+
+                    b.Navigation("Types");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
                 {
                     b.Navigation("Documents");
-
-                    b.Navigation("Processus");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.User", b =>

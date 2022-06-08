@@ -4,6 +4,7 @@ using Application.Models.Request;
 using Application.Models.Responce;
 using Infra.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,7 +33,7 @@ namespace authUsers.Controllers
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", types));
                 }
-                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", types));
+                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table",null));
             }
             catch (Exception ex)
             {
@@ -46,9 +47,10 @@ namespace authUsers.Controllers
         {
             try
             {
+                var proc = _context.Processus.FirstOrDefault(x => x.Id.ToString().Equals(types.ProcessId));
                 if (ModelState.IsValid)
                 {
-                    var type = new Types() { Nom = types.Nom };
+                    var type = new Types() { Nom = types.Nom , Processus = proc};
                     var result = _context.Types.Add(type);
                     await _context.SaveChangesAsync();
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Type has been added successfully", null));
@@ -67,7 +69,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var type = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(id));
+                var type = _context.Types.Include(b => b.Processus).FirstOrDefault(u => u.ID.ToString().Equals(id));
                 if (type != null)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", type.Nom));

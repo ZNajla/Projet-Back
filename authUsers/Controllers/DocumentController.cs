@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -95,9 +96,9 @@ namespace authUsers.Controllers
         {
             try
             {
-                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID.ToString().Equals(id));
-                if (doc != null)
-                {
+                 var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID.ToString().Equals(id));
+                 if (doc != null)
+                 {
                     var role = (await _userManager.GetRolesAsync(doc.User)).FirstOrDefault();
                     var user = new UserDTO(doc.User.Id, doc.User.FullName, doc.User.UserName, doc.User.Email, doc.User.PhoneNumber, doc.User.Adresse, role);
                     if (doc.Types == null)
@@ -110,7 +111,24 @@ namespace authUsers.Controllers
                         var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
                         return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docu));
                     }
-                    
+                 }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        [HttpGet("GetDocByUserId/{id}")]
+        public async Task<object> GetDocByUserId(string id)
+        {
+            try
+            {
+                var doc = await _context.Documents.Include(b => b.Types).Where(b => b.User.Id == id).ToListAsync();
+                if (doc.Count != 0)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", doc));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }

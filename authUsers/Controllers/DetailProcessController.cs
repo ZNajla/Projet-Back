@@ -1,4 +1,5 @@
-﻿using Application.Models.Entitys;
+﻿using Application.Models.DTO;
+using Application.Models.Entitys;
 using Application.Models.Enums;
 using Application.Models.Request;
 using Application.Models.Responce;
@@ -35,13 +36,13 @@ namespace authUsers.Controllers
                 {
                     foreach(AddUpdateDetailProcess detProc in detailProcess)
                     {
-                        var user = _userManager.Users.FirstOrDefault(u => u.Id == detProc.UserId);
+                        var user = _userManager.Users.FirstOrDefault(u => u.Id == detProc.User);
                         var proce = _context.Processus.FirstOrDefault(u => u.Id.ToString().Equals(detProc.ProcessusId));
                         var detProcess = new Detail_Processus() { Action = detProc.Action , Step = detProc.Step , Etat = detProc.Etat , Commentaire = detProc.Commentaire , User = user , Processus = proce};
                         _context.Detail_Processus.Add(detProcess);
                         await _context.SaveChangesAsync();
                     }
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Process has been added successfully", null));
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "detail Process has been added successfully", null));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -55,9 +56,29 @@ namespace authUsers.Controllers
         [HttpGet("GetDetailProcess/{id}")]
         public async Task<object> GetDetailProcess(string id)
         {
+            try
+            {
+                List<DetailProcessDTO> detailProcess = new List<DetailProcessDTO>();
+                var alldetails = _context.Detail_Processus.ToList();
+                if(alldetails.Count != 0)
+                {
+                    foreach (Detail_Processus det in alldetails)
+                    {
+                        if (det.ProcessusId.ToString().Equals(id))
+                        {
+                            var user = _userManager.Users.FirstOrDefault(x => x.Id == det.UserId.ToString());
+                            detailProcess.Add(new DetailProcessDTO(det.Action, det.Step, det.Etat, det.Commentaire, user.UserName , user.Email));
+                        }
+                    }
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK,"", detailProcess));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "The list is empty", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
            
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "", null));
-            
         }
 
         // GET api/<DetailProcessController>/5
