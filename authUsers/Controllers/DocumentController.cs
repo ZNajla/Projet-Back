@@ -1,5 +1,4 @@
-﻿using Application.Models;
-using Application.Models.DTO;
+﻿using Application.Models.DTO;
 using Application.Models.Entitys;
 using Application.Models.Enums;
 using Application.Models.Request;
@@ -8,8 +7,10 @@ using Infra.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Linq;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,10 +25,13 @@ namespace authUsers.Controllers
 
         private readonly UserManager<User> _userManager;
 
-        public DocumentController ( UserManager<User> userManager, AuthDbContext authDbContext)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public DocumentController(UserManager<User> userManager, AuthDbContext authDbContext, IWebHostEnvironment webHostEnvironment)
         {
             _context = authDbContext;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
         // GET: api/<DocumentController>
         [HttpGet("GetAllDoc")]
@@ -76,7 +80,8 @@ namespace authUsers.Controllers
                 {
                     var user = _userManager.Users.FirstOrDefault(u => u.Id == doc.UserId);
                     var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(doc.TypesId));
-                    var document = new Document() { Url = doc.Url, Reference = doc.Reference,  Titre = doc.Titre,
+                    var path = uploadFile(doc.file);
+                    var document = new Document() { Url = path, Reference = doc.Reference,  Titre = doc.Titre,
                         NbPage = doc.NbPage, MotCle = doc.MotCle, Version = doc.Version, Date = DateTime.Now , User = user, Types = types , DateUpdate = DateTime.Now};
                     var result = _context.Documents.Add(document);
                     var entries =await _context.SaveChangesAsync();
@@ -187,6 +192,17 @@ namespace authUsers.Controllers
             }
         }
 
+        [HttpPost("[action]")]
+        public string uploadFile(IFormFile file)
+        {
+            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Uploaded Files");
+            string filePath = Path.Combine(directoryPath, file.FileName);
+            using(var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+            return filePath;
+        }
 
     }
 }

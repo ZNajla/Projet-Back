@@ -1,8 +1,10 @@
-﻿namespace Application.Models.Request
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Application.Models.Request
 {
     public class AddUpdateDoc
     {
-        public string Url { get; set; }
+        public IFormFile file { get; set; }
 
         public string Reference { get; set; }
 

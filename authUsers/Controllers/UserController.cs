@@ -236,7 +236,7 @@ namespace authUsers.Controllers
             return jwtTokenHandler.WriteToken(token);
         }
 
-        [HttpPost("Send")]
+        [HttpPost("[action]")]
         public async Task<object> SendEmailAsync(MailRequest mailRequest)
         {
             var email = new MimeMessage();
@@ -249,18 +249,16 @@ namespace authUsers.Controllers
                 if (mailRequest.Attachments != null)
                 {
                     byte[] fileBytes;
-                    foreach (var file in mailRequest.Attachments)
-                    {
-                        if (file.Length > 0)
+                     if (mailRequest.Attachments.Length > 0)
                         {
                             using (var ms = new MemoryStream())
                             {
-                                file.CopyTo(ms);
+                            mailRequest.Attachments.CopyTo(ms);
                                 fileBytes = ms.ToArray();
                             }
-                            builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                            builder.Attachments.Add(mailRequest.Attachments.FileName, fileBytes, ContentType.Parse(mailRequest.Attachments.ContentType));
                         }
-                    }
+                    
                 }
                 builder.HtmlBody = mailRequest.Body;
                 email.Body = builder.ToMessageBody();

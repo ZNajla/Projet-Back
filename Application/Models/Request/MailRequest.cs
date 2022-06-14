@@ -12,13 +12,13 @@ namespace Application.Models.Request
         public string ToEmail { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-        public List<IFormFile> Attachments { get; set; }
+        public IFormFile Attachments { get; set; }
 
         public MailRequest()
         {
         }
 
-        public MailRequest(string email , string subject , string body , List<IFormFile> attachments)
+        public MailRequest(string email , string subject , string body , IFormFile attachments)
         {
             this.ToEmail = email;
             this.Subject = subject;

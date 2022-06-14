@@ -18,9 +18,7 @@ namespace authUsers.Controllers
     {
         private readonly AuthDbContext _context;
 
-        private readonly UserManager<User> _userManager;
-
-        private Controllers.DetailProcessController _detailProcessController;   
+        private readonly UserManager<User> _userManager; 
 
         public ProcessusController(UserManager<User> userManager, AuthDbContext authDbContext)
         {
@@ -89,17 +87,7 @@ namespace authUsers.Controllers
                  var proc = await _context.Processus.Include(b => b.Detail_Processus).FirstOrDefaultAsync(u => u.Id.ToString().Equals(id));
                  if (proc != null)
                  {
-                    if (proc.Types == null)
-                    {
-                        var procu = new ProcessusDTO(proc.NomProcessus ,proc.Description);
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", proc));
-                    }
-                    else
-                    {
-                        var procu = new ProcessusDTO(proc.NomProcessus, proc.Description);
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", proc));
-                    }
-
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", proc));  
                  }
                  return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -108,8 +96,6 @@ namespace authUsers.Controllers
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
             }
         }
-
-        
 
         // PUT api/<ProcessusController>/5
         [HttpPut("updateProcess/{id}")]

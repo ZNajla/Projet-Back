@@ -59,16 +59,13 @@ namespace authUsers.Controllers
             try
             {
                 List<DetailProcessDTO> detailProcess = new List<DetailProcessDTO>();
-                var alldetails = _context.Detail_Processus.ToList();
+                var alldetails = _context.Detail_Processus.Where(x => x.ProcessusId.ToString().Equals(id)).ToList();
                 if(alldetails.Count != 0)
                 {
                     foreach (Detail_Processus det in alldetails)
                     {
-                        if (det.ProcessusId.ToString().Equals(id))
-                        {
-                            var user = _userManager.Users.FirstOrDefault(x => x.Id == det.UserId.ToString());
-                            detailProcess.Add(new DetailProcessDTO(det.Action, det.Step, det.Etat, det.Commentaire, user.UserName , user.Email));
-                        }
+                        var user = _userManager.Users.FirstOrDefault(x => x.Id == det.UserId.ToString());
+                        detailProcess.Add(new DetailProcessDTO(det.Action, det.Step, det.Etat, det.Commentaire, user.UserName , user.Email));
                     }
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK,"", detailProcess));
                 }
