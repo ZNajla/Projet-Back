@@ -16,5 +16,7 @@ namespace Application.Models.Request
         public string Comment { get; set; }
 
         public int StepNumber { get; set; }
+
+        public string Action { get; set; }
     }
 }

@@ -7,9 +7,6 @@ using Infra.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MimeKit;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -39,30 +36,12 @@ namespace authUsers.Controllers
         {
             try
             {
-                List<DocumentDTO> allDocument = new List<DocumentDTO>();
                 var document = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).ToListAsync();
                 if(document.Count != 0)
                 {
-                    foreach(Document doc in document)
-                    {
-                        var role = (await _userManager.GetRolesAsync(doc.User)).FirstOrDefault();
-                        var user = new UserDTO(doc.User.Id, doc.User.FullName, doc.User.UserName, doc.User.Email, doc.User.PhoneNumber, doc.User.Adresse, role);
-                        if(doc.Types == null)
-                        {
-                            var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user,"" , doc.DateUpdate);
-                            allDocument.Add(docu);
-                        }
-                        else
-                        {
-                            var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
-                            allDocument.Add(docu);
-                        }
-                        
-                    }
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allDocument));
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", document));
                 }
-                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", allDocument));
-
+                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", null));
             }
             catch (Exception ex)
             {

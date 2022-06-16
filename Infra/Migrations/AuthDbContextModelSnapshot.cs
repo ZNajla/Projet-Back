@@ -111,6 +111,10 @@ namespace Infra.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -157,6 +161,34 @@ namespace Infra.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Processus");
+                });
+
+            modelBuilder.Entity("Application.Models.Entitys.Tache", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("DocumentID")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("DocumentID");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Taches");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
@@ -434,6 +466,23 @@ namespace Infra.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Application.Models.Entitys.Tache", b =>
+                {
+                    b.HasOne("Application.Models.Entitys.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Application.Models.Entitys.User", "User")
+                        .WithMany("Taches")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Document");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
                 {
                     b.HasOne("Application.Models.Entitys.Processus", "Processus")
@@ -518,6 +567,8 @@ namespace Infra.Migrations
                     b.Navigation("Detail_Processus");
 
                     b.Navigation("Documents");
+
+                    b.Navigation("Taches");
                 });
 #pragma warning restore 612, 618
         }

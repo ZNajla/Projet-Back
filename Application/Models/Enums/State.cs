@@ -3,6 +3,7 @@
     public enum State
     {
         Awaiting,
+        In_Progress,
         draft,
         Validated,
         Cancelled,

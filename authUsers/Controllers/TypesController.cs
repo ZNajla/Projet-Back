@@ -28,7 +28,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var types = _context.Types.ToList();
+                var types = _context.Types.Include(u => u.Processus).ToList();
                 if (types.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", types));

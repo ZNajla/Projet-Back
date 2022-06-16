@@ -12,6 +12,8 @@ namespace Application.Models.Entitys
 
         public int NumeroState { get; set; }
 
+        public string Action { get; set; }
+
         public DateTime Date { get; set; }
 
         public string Comment { get; set; }

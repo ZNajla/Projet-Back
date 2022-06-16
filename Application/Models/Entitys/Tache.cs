@@ -7,16 +7,13 @@ namespace Application.Models.Entitys
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ID { get; set; }
 
-        public string Nom { get; set; }
+        public string Action { get; set; }
 
-        public string Description { get; set; }
+        public DateTime DateCreation { get; set; }
 
-        public DateTime DateDebut { get; set; }
+        public virtual User User { get; set; }
 
-        public DateTime DateFin { get; set; }
+        public virtual Document Document { get; set; }
 
-        public string Etat { get; set; }
-
-        public ICollection<User> Users { get; set; }
     }
 }

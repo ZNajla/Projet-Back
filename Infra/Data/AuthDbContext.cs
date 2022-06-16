@@ -20,7 +20,7 @@ namespace Infra.Data
         }
 
         public DbSet<Document> Documents { get; set; }
-        //public DbSet<Tache> Taches { get; set; }
+        public DbSet<Tache> Taches { get; set; }
         public DbSet<Types> Types { get; set; }
         public DbSet<Processus> Processus { get; set; }
         public DbSet<Detail_Processus> Detail_Processus { get; set; }
