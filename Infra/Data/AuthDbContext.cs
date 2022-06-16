@@ -15,8 +15,6 @@ namespace Infra.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-           modelBuilder.Entity<Step>()
-                .HasKey(c => new { c.UserId, c.DocumentId });
             modelBuilder.Entity<Detail_Processus>()
                 .HasKey(c => new { c.UserId, c.ProcessusId });
         }
@@ -26,7 +24,7 @@ namespace Infra.Data
         public DbSet<Types> Types { get; set; }
         public DbSet<Processus> Processus { get; set; }
         public DbSet<Detail_Processus> Detail_Processus { get; set; }
-        public DbSet<Step> Steps { get; set; }
+        public DbSet<DocumentState> DocumentState { get; set; }
 
     }
 }

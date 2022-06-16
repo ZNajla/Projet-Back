@@ -55,6 +55,12 @@ namespace Infra.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("CurrentNumberState")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CurrentState")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
@@ -99,6 +105,41 @@ namespace Infra.Migrations
                     b.ToTable("Documents");
                 });
 
+            modelBuilder.Entity("Application.Models.Entitys.DocumentState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("NumeroState")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StateDocument")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DocumentState");
+                });
+
             modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
                 {
                     b.Property<Guid>("Id")
@@ -116,24 +157,6 @@ namespace Infra.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Processus");
-                });
-
-            modelBuilder.Entity("Application.Models.Entitys.Step", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<Guid>("DocumentId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("date_debut")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("UserId", "DocumentId");
-
-                    b.HasIndex("DocumentId");
-
-                    b.ToTable("Steps");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Types", b =>
@@ -392,16 +415,16 @@ namespace Infra.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Application.Models.Entitys.Step", b =>
+            modelBuilder.Entity("Application.Models.Entitys.DocumentState", b =>
                 {
                     b.HasOne("Application.Models.Entitys.Document", "Document")
-                        .WithMany("Steps")
+                        .WithMany("DocumentStates")
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Application.Models.Entitys.User", "User")
-                        .WithMany("Steps")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -475,7 +498,7 @@ namespace Infra.Migrations
 
             modelBuilder.Entity("Application.Models.Entitys.Document", b =>
                 {
-                    b.Navigation("Steps");
+                    b.Navigation("DocumentStates");
                 });
 
             modelBuilder.Entity("Application.Models.Entitys.Processus", b =>
@@ -495,8 +518,6 @@ namespace Infra.Migrations
                     b.Navigation("Detail_Processus");
 
                     b.Navigation("Documents");
-
-                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

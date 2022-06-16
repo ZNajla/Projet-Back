@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Application.Models.Enums;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Application.Models.Entitys
@@ -24,11 +25,15 @@ namespace Application.Models.Entitys
 
         public DateTime DateUpdate { get; set; }
 
+        public State CurrentState { get; set; }
+
+        public int CurrentNumberState { get; set; }
+
         public virtual User User { get; set; }
 
         public virtual Types Types { get; set; }
 
-        public ICollection<Step> Steps { get; set; }
+        public ICollection<DocumentState> DocumentStates { get; set; }
 
     }
 }

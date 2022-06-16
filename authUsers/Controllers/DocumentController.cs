@@ -40,7 +40,7 @@ namespace authUsers.Controllers
             try
             {
                 List<DocumentDTO> allDocument = new List<DocumentDTO>();
-                var document = await _context.Documents.Include(b => b.User).Include(b => b.Types).ToListAsync();
+                var document = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).ToListAsync();
                 if(document.Count != 0)
                 {
                     foreach(Document doc in document)
@@ -70,6 +70,24 @@ namespace authUsers.Controllers
             }
         }
 
+        [HttpGet("GetDocumentByState/{state}")]
+        public async Task<object> GetDocumentByState(int state)
+        {
+            try
+            {
+                var docList = _context.Documents.Where(u => u.CurrentState.Equals(state)).ToList();
+                if (docList != null)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docList));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "there is no document with that state", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
         // POST api/<DocumentController>
         [HttpPost("AddDoc")]
         public async Task<object> AddDoc([FromBody] AddUpdateDoc doc)
@@ -80,12 +98,12 @@ namespace authUsers.Controllers
                 {
                     var user = _userManager.Users.FirstOrDefault(u => u.Id == doc.UserId);
                     var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(doc.TypesId));
-                    var path = uploadFile(doc.file);
-                    var document = new Document() { Url = path, Reference = doc.Reference,  Titre = doc.Titre,
+                    //var path = uploadFile(doc.file);
+                    var document = new Document() { Url = doc.file, Reference = doc.Reference,  Titre = doc.Titre,
                         NbPage = doc.NbPage, MotCle = doc.MotCle, Version = doc.Version, Date = DateTime.Now , User = user, Types = types , DateUpdate = DateTime.Now};
                     var result = _context.Documents.Add(document);
                     var entries =await _context.SaveChangesAsync();
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", null));
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -178,9 +196,14 @@ namespace authUsers.Controllers
             try
             {
                 var doc = _context.Documents.FirstOrDefault(u => u.ID.ToString().Equals(id));
+                var docState = _context.DocumentState.Where(u => u.DocumentId.ToString().Equals(id)).ToList();
                 if (doc != null)
                 {
                     _context.Documents.Remove(doc);
+                    foreach (DocumentState state in docState)
+                    {
+                        _context.DocumentState.Remove(state);
+                    }
                     await _context.SaveChangesAsync();
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been Deleted", null));
                 }

@@ -4,7 +4,7 @@ namespace Application.Models.Request
 {
     public class AddUpdateDoc
     {
-        public IFormFile file { get; set; }
+        public string file { get; set; }
 
         public string Reference { get; set; }
 

@@ -10,6 +10,5 @@ namespace Application.Models.Entitys
         public virtual ICollection<Document> Documents { get; set; }
        // public ICollection<Tache> Taches{ get; set; }
         public ICollection<Detail_Processus> Detail_Processus { get; set; }
-        public ICollection<Step> Steps { get; set; }
     }
 }
