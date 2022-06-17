@@ -52,7 +52,6 @@ namespace authUsers.Controllers
             }
         }
 
-
         // GET: api/<ProcessusController>
         [HttpGet("GetAllProcessus")]
         public async Task<object> GetAllProcessus()
@@ -78,7 +77,7 @@ namespace authUsers.Controllers
             }
         }
 
-        // GET api/<ProcessusController>/5
+        // GET api/<ProcessusController>
         [HttpGet("GetProcessById/{id}")]
         public async Task<object> GetProcessById(string id)
         {
@@ -119,15 +118,20 @@ namespace authUsers.Controllers
             }
         }
 
-        // DELETE api/<ProcessusController>/5
+        // DELETE api/<ProcessusController>
         [HttpDelete("DeleteProcessus/{id}")]
         public async Task<object> DeleteProcessus(string id)
         {
             try
             {
                 var proc = _context.Processus.FirstOrDefault(u => u.Id.ToString().Equals(id));
+                var listTypes = _context.Types.Where(x => x.Processus.Id.ToString().Equals(id)).ToList();
                 if (proc != null)
                 {
+                    foreach (Types type in listTypes)
+                    {
+                        type.Processus = null;
+                    }
                     _context.Processus.Remove(proc);
                     await _context.SaveChangesAsync();
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Processus has been Deleted", null));

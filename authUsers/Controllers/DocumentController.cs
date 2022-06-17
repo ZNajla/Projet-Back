@@ -30,6 +30,43 @@ namespace authUsers.Controllers
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
         }
+
+        // POST api/<DocumentController>
+        [HttpPost("AddDoc")]
+        public async Task<object> AddDoc([FromBody] AddUpdateDoc doc)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var user = _userManager.Users.FirstOrDefault(u => u.Id == doc.UserId);
+                    var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(doc.TypesId));
+                    //var path = uploadFile(doc.file);
+                    var document = new Document()
+                    {
+                        Url = doc.file,
+                        Reference = doc.Reference,
+                        Titre = doc.Titre,
+                        NbPage = doc.NbPage,
+                        MotCle = doc.MotCle,
+                        Version = doc.Version,
+                        Date = DateTime.Now,
+                        User = user,
+                        Types = types,
+                        DateUpdate = DateTime.Now
+                    };
+                    var result = _context.Documents.Add(document);
+                    var entries = await _context.SaveChangesAsync();
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
         // GET: api/<DocumentController>
         [HttpGet("GetAllDoc")]
         public async Task<object> GetAllDoc()
@@ -49,6 +86,7 @@ namespace authUsers.Controllers
             }
         }
 
+        // GET: api/<DocumentController>
         [HttpGet("GetDocumentByState/{state}")]
         public async Task<object> GetDocumentByState(int state)
         {
@@ -67,32 +105,7 @@ namespace authUsers.Controllers
             }
         }
 
-        // POST api/<DocumentController>
-        [HttpPost("AddDoc")]
-        public async Task<object> AddDoc([FromBody] AddUpdateDoc doc)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var user = _userManager.Users.FirstOrDefault(u => u.Id == doc.UserId);
-                    var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(doc.TypesId));
-                    //var path = uploadFile(doc.file);
-                    var document = new Document() { Url = doc.file, Reference = doc.Reference,  Titre = doc.Titre,
-                        NbPage = doc.NbPage, MotCle = doc.MotCle, Version = doc.Version, Date = DateTime.Now , User = user, Types = types , DateUpdate = DateTime.Now};
-                    var result = _context.Documents.Add(document);
-                    var entries =await _context.SaveChangesAsync();
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
-            }
-        }
-
-        // GET api/<DocumentController>/5
+        // GET api/<DocumentController>
         [HttpGet("GetDocById/{id}")]
         public async Task<object> GetDocById(string id)
         {
@@ -122,6 +135,7 @@ namespace authUsers.Controllers
             }
         }
 
+        // GET api/<DocumentController>
         [HttpGet("GetDocByUserId/{id}")]
         public async Task<object> GetDocByUserId(string id)
         {

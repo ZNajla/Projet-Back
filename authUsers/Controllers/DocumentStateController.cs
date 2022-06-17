@@ -22,27 +22,6 @@ namespace authUsers.Controllers
             _context = context;
         }
 
-
-        // GET api/<DocumentStateController>/5
-        [HttpGet("GetDocumentState/{docId}")]
-        public async Task<object> GetDocumentState(string docId)
-        {
-            try
-            {
-                var docState = _context.DocumentState.Where(u => u.DocumentId.ToString().Equals(docId)).ToList();
-                if (docState != null)
-                {
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docState));
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
-            }
-        }
-
-        
         // POST api/<DocumentStateController>
         [HttpPost("AddDocStatue/{idDoc}")]
         public async Task<object> AddDocStatue(string idDoc)
@@ -50,9 +29,9 @@ namespace authUsers.Controllers
             try
             {
                 var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID.ToString().Equals(idDoc));
-                var typeDoc = await _context.Types.Include(b => b.Processus).FirstOrDefaultAsync(b => b.ID.Equals(doc.Types.ID)); 
+                var typeDoc = await _context.Types.Include(b => b.Processus).FirstOrDefaultAsync(b => b.ID.Equals(doc.Types.ID));
                 List<Detail_Processus> detProc = _context.Detail_Processus.Include(x => x.User).Where(b => b.ProcessusId.Equals(typeDoc.Processus.Id)).ToList();
-                if(detProc.Count != 0)
+                if (detProc.Count != 0)
                 {
                     foreach (Detail_Processus detail in detProc)
                     {
@@ -72,6 +51,25 @@ namespace authUsers.Controllers
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document State has been added successfully", null));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", typeDoc));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        // GET api/<DocumentStateController>
+        [HttpGet("GetDocumentState/{docId}")]
+        public async Task<object> GetDocumentState(string docId)
+        {
+            try
+            {
+                var docState = _context.DocumentState.Where(u => u.DocumentId.ToString().Equals(docId)).ToList();
+                if (docState != null)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docState));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
             catch (Exception ex)
             {
@@ -123,7 +121,6 @@ namespace authUsers.Controllers
                                 step.StateDocument = docStatue.StateDocument;
                                 step.Comment = docStatue.Comment;
                                 step.Date = docStatue.Date;
-                                //SEND NOTIFICATION TO NEXT USER TO VALIDAT OR CHECK
                                 await _context.SaveChangesAsync();
                                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document State In Progress ", null));
                             }

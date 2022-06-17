@@ -60,6 +60,38 @@ namespace authUsers.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost("AddUserToRole")]
+        public async Task<object> AddUserToRole([FromBody] AddRemoveUserToRole model)
+        {
+            try
+            {
+                // Check if the user exist
+                var user = _userManager.Users.FirstOrDefault(u => u.Id == model.iduser);
+                if (user == null) // User does not exist
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "User Does not exist", null));
+                }
+                // Check if the role exist
+                var roleExist = await _roleManager.RoleExistsAsync(model.roleName);
+                if (!roleExist) // checks on the role exist status
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Role Does not exist", null));
+                }
+                var result = await _userManager.AddToRoleAsync(user, model.roleName);
+                // Check if the user is assigned to the role successfully
+                if (result.Succeeded)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Success, user has been added to the role", null));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
         //[Authorize(Roles = "Admin")]
         [HttpGet("GetAllRoles")]
         public async Task<object> GetAllRoles()
@@ -68,26 +100,6 @@ namespace authUsers.Controllers
             {
                 var roles = _roleManager.Roles.Select(x => x.Name).ToList();
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", roles));
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
-            }
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("DeleteRole/{name}")]
-        public async Task<object> DeleteRole(string name)
-        {
-            try
-            {
-                var role = _roleManager.Roles.FirstOrDefault(u => u.Name == name);
-                if (role != null)
-                {
-                    await _roleManager.DeleteAsync(role);
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "role has been Deleted", null));
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
             catch (Exception ex)
             {
@@ -112,6 +124,26 @@ namespace authUsers.Controllers
                     }
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allUserDTO));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("DeleteRole/{name}")]
+        public async Task<object> DeleteRole(string name)
+        {
+            try
+            {
+                var role = _roleManager.Roles.FirstOrDefault(u => u.Name == name);
+                if (role != null)
+                {
+                    await _roleManager.DeleteAsync(role);
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "role has been Deleted", null));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
             catch (Exception ex)
             {
@@ -145,38 +177,5 @@ namespace authUsers.Controllers
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
             }
         }
-
-        [Authorize]
-        [HttpPost("AddUserToRole")]
-        public async Task<object> AddUserToRole([FromBody] AddRemoveUserToRole model)
-        {
-            try
-            {
-                // Check if the user exist
-                var user = _userManager.Users.FirstOrDefault(u => u.Id == model.iduser);
-                if (user == null) // User does not exist
-                {
-                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "User Does not exist", null));
-                }
-                // Check if the role exist
-                var roleExist = await _roleManager.RoleExistsAsync(model.roleName);
-                if (!roleExist) // checks on the role exist status
-                {
-                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Role Does not exist", null));
-                }
-                var result = await _userManager.AddToRoleAsync(user, model.roleName);
-                // Check if the user is assigned to the role successfully
-                if (result.Succeeded)
-                {
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Success, user has been added to the role", null));
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
-            }
-        }
     }
-
 }

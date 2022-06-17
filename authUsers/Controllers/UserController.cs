@@ -52,10 +52,6 @@ namespace authUsers.Controllers
         {
             try
             {
-                //if (!await _roleManager.RoleExistsAsync(model.Role))
-                //{
-                  //  return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Role does not exist", null));
-                //}
                 var user = new User() { FullName = model.FullName, Email = model.Email, UserName = model.UserName , Adresse = model.Adresse, PhoneNumber = model.PhoneNumber};
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -75,7 +71,37 @@ namespace authUsers.Controllers
             {
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
             }
+        }
 
+        [HttpPost("Login")]
+        public async Task<object> Login([FromBody] LoginModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var userEmail = await _userManager.FindByEmailAsync(model.Email);
+                    if (userEmail != null)
+                    {
+                        var result = await _signInManager.PasswordSignInAsync(userEmail.UserName, model.Password, false, false);
+                        if (result.Succeeded)
+                        {
+                            var appUser = await _userManager.FindByNameAsync(userEmail.UserName);
+                            var role = (await _userManager.GetRolesAsync(appUser)).FirstOrDefault();
+                            var user = new UserDTO(appUser.Id, appUser.FullName, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.Adresse, role);
+                            user.Token = GenerateToken(appUser, role);
+                            return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", user));
+                        }
+                        return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Check your password ", null));
+                    }
+                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Email does not exist", null));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Invalid Email or Passwod", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
         }
 
         /* GetAllUsers retourne la liste de tous les utilisateurs sauf les Admins */
@@ -96,14 +122,12 @@ namespace authUsers.Controllers
                     }
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allUserDTO));
-
             }
             catch (Exception ex)
             {
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
             }
         }
-
 
         [Authorize]
         [HttpGet("GetUserById/{id}")]
@@ -161,7 +185,6 @@ namespace authUsers.Controllers
         [HttpDelete("DeleteUser/{id}")]
         public async Task<object> DeleteUser(string id)
         {
-
             try
             {
                 var user = _userManager.Users.FirstOrDefault(u => u.Id == id);
@@ -176,37 +199,6 @@ namespace authUsers.Controllers
                     return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Can't Delete Admin", null));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "user does not exist", null));
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
-            }
-        }
-
-        [HttpPost("Login")]
-        public async Task<object> Login([FromBody] LoginModel model)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var userEmail = await _userManager.FindByEmailAsync(model.Email);
-                    if(userEmail != null)
-                    {
-                        var result = await _signInManager.PasswordSignInAsync(userEmail.UserName, model.Password, false, false);
-                        if (result.Succeeded)
-                        {
-                            var appUser = await _userManager.FindByNameAsync(userEmail.UserName);
-                            var role = (await _userManager.GetRolesAsync(appUser)).FirstOrDefault();
-                            var user = new UserDTO(appUser.Id, appUser.FullName, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.Adresse, role);
-                            user.Token = GenerateToken(appUser, role);
-                            return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", user));
-                        }
-                        return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Check your password ",null));
-                    }
-                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Email does not exist", null));
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Invalid Email or Passwod", null));
             }
             catch (Exception ex)
             {
@@ -258,7 +250,6 @@ namespace authUsers.Controllers
                             }
                             builder.Attachments.Add(mailRequest.Attachments.FileName, fileBytes, ContentType.Parse(mailRequest.Attachments.ContentType));
                         }
-                    
                 }
                 builder.HtmlBody = mailRequest.Body;
                 email.Body = builder.ToMessageBody();

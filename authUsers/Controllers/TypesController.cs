@@ -14,12 +14,33 @@ namespace authUsers.Controllers
     [ApiController]
     public class TypesController : ControllerBase
     {
-
         private readonly AuthDbContext _context;
 
         public TypesController(AuthDbContext authDbContext)
         {
             _context = authDbContext;
+        }
+
+        // POST api/<TypesController>
+        [HttpPost("AddType")]
+        public async Task<object> AddType([FromBody] AddUpdateTypes types)
+        {
+            try
+            {
+                var proc = _context.Processus.FirstOrDefault(x => x.Id.ToString().Equals(types.ProcessId));
+                if (ModelState.IsValid)
+                {
+                    var type = new Types() { Nom = types.Nom, Processus = proc };
+                    var result = _context.Types.Add(type);
+                    await _context.SaveChangesAsync();
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Type has been added successfully", null));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
         }
 
         // GET: api/<TypesController>
@@ -41,29 +62,7 @@ namespace authUsers.Controllers
             }
         }
 
-        // POST api/<TypesController>
-        [HttpPost("AddType")]
-        public async Task<object> AddType([FromBody] AddUpdateTypes types)
-        {
-            try
-            {
-                var proc = _context.Processus.FirstOrDefault(x => x.Id.ToString().Equals(types.ProcessId));
-                if (ModelState.IsValid)
-                {
-                    var type = new Types() { Nom = types.Nom , Processus = proc};
-                    var result = _context.Types.Add(type);
-                    await _context.SaveChangesAsync();
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Type has been added successfully", null));
-                }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
-            }
-        }
-
-        // GET api/<TypesController>/5
+        // GET api/<TypesController>
         [HttpGet("GetTypeById/{id}")]
         public async Task<object> GetTypeById(string id)
         {
@@ -89,8 +88,13 @@ namespace authUsers.Controllers
             try
             {
                 var type = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(id));
+                var listDocs = _context.Documents.Where(x => x.Types.ID.ToString().Equals(id)).ToList();
                 if (type != null)
                 {
+                    foreach (Document doc in listDocs)
+                    {
+                        doc.Types = null;
+                    }
                     _context.Types.Remove(type);
                     await _context.SaveChangesAsync();
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Type has been Deleted", null));
