@@ -28,7 +28,7 @@ C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.AssemblyInf
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.csproj.CoreCompileInputs.cache
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.csproj.CopyComplete
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.dll
-C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\ref\Infra.dll
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\refint\Infra.dll
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.pdb
 C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\Infra.genruntimeconfig.cache
-C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\refint\Infra.dll
+C:\Users\Lenovo\Desktop\PFE\Projet Back\Infra\obj\Debug\net6.0\ref\Infra.dll

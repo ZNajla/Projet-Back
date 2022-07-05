@@ -12,6 +12,18 @@
 
         public string Adresse { get; set; }
 
+        public string Gender { get; set; }
+
+        public DateTime BirthDate { get; set; }
+
+        public string Facebook { get; set; }
+
+        public string Google { get; set; }
+
+        public string Linkedin { get; set; }
+
+        public DateTime LastTimeLogedIn { get; set; }
+
         public string Role { get; set; }
 
         public string Password { get; set; }

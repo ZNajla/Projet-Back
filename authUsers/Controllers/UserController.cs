@@ -52,7 +52,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var user = new User() { FullName = model.FullName, Email = model.Email, UserName = model.UserName , Adresse = model.Adresse, PhoneNumber = model.PhoneNumber};
+                var user = new User() { FullName = model.FullName, Email = model.Email, UserName = model.UserName , Adresse = model.Adresse, PhoneNumber = model.PhoneNumber , Gender = model.Gender , BirthDate = model.BirthDate , Facebook = model.Facebook , Google = model.Google , Linkedin = model.Linkedin , LastTimeLogedIn = model.LastTimeLogedIn};
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -61,7 +61,7 @@ namespace authUsers.Controllers
                         var tempUser = await _userManager.FindByEmailAsync(model.Email);
                         await _userManager.AddToRoleAsync(tempUser, model.Role);
                     }
-                    var mailRequest = new MailRequest(model.Email, "Welcome", "Email : " + model.Email + " Password : " + model.Password,null);
+                    var mailRequest = new MailRequest(model.Email, "Welcome", "Email : " + model.Email + " Password : " + model.Password);
                     SendEmailAsync(mailRequest);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User Has been Added", null));
                 }
@@ -88,7 +88,7 @@ namespace authUsers.Controllers
                         {
                             var appUser = await _userManager.FindByNameAsync(userEmail.UserName);
                             var role = (await _userManager.GetRolesAsync(appUser)).FirstOrDefault();
-                            var user = new UserDTO(appUser.Id, appUser.FullName, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.Adresse, role);
+                            var user = new UserDTO(appUser.Id, appUser.FullName, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.Adresse, appUser.Gender, appUser.BirthDate, appUser.Facebook, appUser.Google, appUser.Linkedin, appUser.LastTimeLogedIn, role);
                             user.Token = GenerateToken(appUser, role);
                             return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", user));
                         }
@@ -105,7 +105,7 @@ namespace authUsers.Controllers
         }
 
         /* GetAllUsers retourne la liste de tous les utilisateurs sauf les Admins */
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpGet("GetAllUsers")]
         public async Task<object> GetAllUsers()
         {
@@ -118,7 +118,7 @@ namespace authUsers.Controllers
                     var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                     if (role != "Admin")
                     {
-                        allUserDTO.Add(new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber , user.Adresse, role ));
+                        allUserDTO.Add(new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender, user.BirthDate, user.Facebook, user.Google, user.Linkedin, user.LastTimeLogedIn, role));
                     }
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allUserDTO));
@@ -139,7 +139,7 @@ namespace authUsers.Controllers
                 if(user != null)
                 {
                     var roles = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-                    var newUser = new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, roles);
+                    var newUser = new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender, user.BirthDate, user.Facebook, user.Google, user.Linkedin, user.LastTimeLogedIn, roles);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", newUser));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
@@ -150,7 +150,7 @@ namespace authUsers.Controllers
             }
         }
 
-        [Authorize]
+       // [Authorize]
         [HttpPut("UpdateUser/{id}")]
         public async Task<object> UpdateUser(string id, [FromBody] AddUpdateUserModel model)
         {
@@ -169,9 +169,34 @@ namespace authUsers.Controllers
                     user.Email = model.Email;
                     user.Adresse = model.Adresse;
                     user.PhoneNumber = model.PhoneNumber;
+                    user.Gender = model.Gender;
+                    user.BirthDate = model.BirthDate;
+                    user.Facebook = model.Facebook;
+                    user.Google = model.Google;
+                    user.Linkedin = model.Linkedin;
                     await _userManager.AddToRoleAsync(user, model.Role);
                     await _userManager.UpdateAsync(user);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User has been updated", null));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        [HttpPut("Logout/{id}")]
+        public async Task<object> Logout(string id)
+        {
+            try
+            {
+                var user = _userManager.Users.FirstOrDefault(u => u.Id == id);
+                if (user != null)
+                {
+                    user.LastTimeLogedIn = DateTime.Now;
+                    await _userManager.UpdateAsync(user);
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User has Loged out successfuly", null));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -238,19 +263,6 @@ namespace authUsers.Controllers
                 email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
                 email.Subject = mailRequest.Subject;
                 var builder = new BodyBuilder();
-                if (mailRequest.Attachments != null)
-                {
-                    byte[] fileBytes;
-                     if (mailRequest.Attachments.Length > 0)
-                        {
-                            using (var ms = new MemoryStream())
-                            {
-                            mailRequest.Attachments.CopyTo(ms);
-                                fileBytes = ms.ToArray();
-                            }
-                            builder.Attachments.Add(mailRequest.Attachments.FileName, fileBytes, ContentType.Parse(mailRequest.Attachments.ContentType));
-                        }
-                }
                 builder.HtmlBody = mailRequest.Body;
                 email.Body = builder.ToMessageBody();
                 using var smtp = new SmtpClient();

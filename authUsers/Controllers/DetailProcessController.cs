@@ -38,7 +38,7 @@ namespace authUsers.Controllers
                     {
                         var user = _userManager.Users.FirstOrDefault(u => u.Id == detProc.User);
                         var proce = _context.Processus.FirstOrDefault(u => u.Id.ToString().Equals(detProc.ProcessusId));
-                        var detProcess = new Detail_Processus() { Action = detProc.Action , Step = detProc.Step , Etat = detProc.Etat , Commentaire = detProc.Commentaire , User = user , Processus = proce};
+                        var detProcess = new Detail_Processus() { Action = detProc.Action , Step = detProc.Step , User = user , Processus = proce};
                         _context.Detail_Processus.Add(detProcess);
                         await _context.SaveChangesAsync();
                     }
@@ -65,7 +65,7 @@ namespace authUsers.Controllers
                     foreach (Detail_Processus det in alldetails)
                     {
                         var user = _userManager.Users.FirstOrDefault(x => x.Id == det.UserId.ToString());
-                        detailProcess.Add(new DetailProcessDTO(det.Action, det.Step, det.Etat, det.Commentaire, user.UserName , user.Email));
+                        detailProcess.Add(new DetailProcessDTO(det.Action, det.Step, user.UserName , user.Email));
                     }
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK,"", detailProcess));
                 }

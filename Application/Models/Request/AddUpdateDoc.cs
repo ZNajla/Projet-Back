@@ -16,7 +16,7 @@ namespace Application.Models.Request
 
         public string Version { get; set; }
 
-        public DateTime DateUpdate { get; set; }
+        public int CurrentState { get; set; }
 
         public string UserId { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 
 namespace Application.Models.Entitys
 {
@@ -6,6 +7,12 @@ namespace Application.Models.Entitys
     {
         public string FullName { get; set; } = String.Empty;
         public string Adresse { get; set; } = String.Empty;
+        public string Gender { get; set; } = String.Empty;
+        public DateTime BirthDate { get; set; }
+        public string Facebook { get; set; } = String.Empty;
+        public string Google { get; set; } = String.Empty;
+        public string Linkedin { get; set; } = String.Empty;
+        public DateTime LastTimeLogedIn { get; set; }
 
         public virtual ICollection<Document> Documents { get; set; }
         public ICollection<Tache> Taches{ get; set; }

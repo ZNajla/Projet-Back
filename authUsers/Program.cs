@@ -8,6 +8,9 @@ using Application.Configuration;
 using Application.Models.Request;
 using Application.Models.Entitys;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("strConnection");
@@ -36,6 +39,13 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader();
         });
+});
+
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
 });
 
 builder.Services.AddControllers().AddJsonOptions(x =>
@@ -77,7 +87,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("_myAllowSpecificOrigins");
 app.UseAuthentication();
-
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Uploaded Files")),
+    RequestPath = new PathString("/Uploaded Files")
+});
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

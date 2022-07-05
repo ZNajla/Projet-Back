@@ -7,6 +7,7 @@ using Infra.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -42,22 +43,50 @@ namespace authUsers.Controllers
                     var user = _userManager.Users.FirstOrDefault(u => u.Id == doc.UserId);
                     var types = _context.Types.FirstOrDefault(u => u.ID.ToString().Equals(doc.TypesId));
                     //var path = uploadFile(doc.file);
-                    var document = new Document()
+                    if(doc.CurrentState == 0)
                     {
-                        Url = doc.file,
-                        Reference = doc.Reference,
-                        Titre = doc.Titre,
-                        NbPage = doc.NbPage,
-                        MotCle = doc.MotCle,
-                        Version = doc.Version,
-                        Date = DateTime.Now,
-                        User = user,
-                        Types = types,
-                        DateUpdate = DateTime.Now
-                    };
-                    var result = _context.Documents.Add(document);
-                    var entries = await _context.SaveChangesAsync();
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
+                        var document = new Document()
+                        {
+                            Url = doc.file,
+                            Reference = doc.Reference,
+                            Titre = doc.Titre,
+                            NbPage = doc.NbPage,
+                            MotCle = doc.MotCle,
+                            Version = doc.Version,
+                            Date = DateTime.Now,
+                            DateUpdate = DateTime.Now,
+                            CurrentState = State.Awaiting,
+                            CurrentNumberState = 1, //etat du document a l'etape i
+                            User = user,
+                            Types = types
+                        };
+                        var result = _context.Documents.Add(document);
+                        var entries = await _context.SaveChangesAsync();
+                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
+                    }
+                    else
+                    {
+                        var document = new Document()
+                        {
+                            Url = doc.file,
+                            Reference = doc.Reference,
+                            Titre = doc.Titre,
+                            NbPage = doc.NbPage,
+                            MotCle = doc.MotCle,
+                            Version = doc.Version,
+                            Date = DateTime.Now,
+                            DateUpdate = DateTime.Now,
+                            CurrentState = State.draft ,
+                            CurrentNumberState = 1, //etat du document a l'etape i
+                            User = user,
+                            Types = types
+                        };
+                        var result = _context.Documents.Add(document);
+                        var entries = await _context.SaveChangesAsync();
+                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
+                    }
+                    
+                    
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -88,12 +117,12 @@ namespace authUsers.Controllers
 
         // GET: api/<DocumentController>
         [HttpGet("GetDocumentByState/{state}")]
-        public async Task<object> GetDocumentByState(int state)
+        public async Task<object> GetDocumentByState(string state)
         {
             try
             {
-                var docList = _context.Documents.Where(u => u.CurrentState.Equals(state)).ToList();
-                if (docList != null)
+                var docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).Where(u => u.CurrentState.Equals(state)).ToList();
+                if (docList.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docList));
                 }
@@ -111,21 +140,10 @@ namespace authUsers.Controllers
         {
             try
             {
-                 var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).FirstOrDefaultAsync(u => u.ID.ToString().Equals(id));
+                 var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).FirstOrDefaultAsync(u => u.ID.ToString().Equals(id));
                  if (doc != null)
                  {
-                    var role = (await _userManager.GetRolesAsync(doc.User)).FirstOrDefault();
-                    var user = new UserDTO(doc.User.Id, doc.User.FullName, doc.User.UserName, doc.User.Email, doc.User.PhoneNumber, doc.User.Adresse, role);
-                    if (doc.Types == null)
-                    {
-                        var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, "" , doc.DateUpdate);
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docu));
-                    }
-                    else
-                    {
-                        var docu = new DocumentDTO(doc.ID.ToString(), doc.Url, doc.Reference, doc.Titre, doc.NbPage, doc.MotCle, doc.Version, doc.Date, user, doc.Types.Nom, doc.DateUpdate);
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docu));
-                    }
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", doc));
                  }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -141,7 +159,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var doc = await _context.Documents.Include(b => b.Types).Where(b => b.User.Id == id).ToListAsync();
+                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).Where(b => b.User.Id == id).ToListAsync();
                 if (doc.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", doc));
@@ -192,6 +210,10 @@ namespace authUsers.Controllers
                 var docState = _context.DocumentState.Where(u => u.DocumentId.ToString().Equals(id)).ToList();
                 if (doc != null)
                 {
+                    if (System.IO.File.Exists(doc.Url))
+                    {
+                        System.IO.File.Delete(doc.Url);
+                    }
                     _context.Documents.Remove(doc);
                     foreach (DocumentState state in docState)
                     {
@@ -208,16 +230,32 @@ namespace authUsers.Controllers
             }
         }
 
-        [HttpPost("[action]")]
-        public string uploadFile(IFormFile file)
+        [HttpPost("Upload"), DisableRequestSizeLimit]
+        public async Task<object> Upload()
         {
-            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "Uploaded Files");
-            string filePath = Path.Combine(directoryPath, file.FileName);
-            using(var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                file.CopyTo(stream);
+                var file = Request.Form.Files[0];
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Uploaded Files");
+                if (file.Length > 0)
+                {
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var fullPath = Path.Combine(pathToSave, fileName);
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", fullPath));
+                }
+                else
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Error Size", null));
+                }
             }
-            return filePath;
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
         }
 
     }

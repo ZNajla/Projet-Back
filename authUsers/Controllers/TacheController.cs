@@ -37,7 +37,7 @@ namespace authUsers.Controllers
                     List<DocumentState> docstates = _context.DocumentState.Include(x => x.User).Where(x => x.DocumentId.ToString().Equals(idDoc)).ToList();
                     if(docstates.Count >= document.CurrentNumberState)
                     {
-                        var currentState = docstates.Find(x => x.NumeroState.Equals(document.CurrentNumberState));
+                        var currentState = docstates.Find(x => x.StepNumber.Equals(document.CurrentNumberState));
                         if (currentState != null)
                         {
                             var tache = new Tache()
@@ -98,6 +98,24 @@ namespace authUsers.Controllers
             try
             {
                 var taches = await _context.Taches.Include(x => x.User).Include(x => x.Document).ToListAsync();
+                if (taches.Count != 0)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", taches));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        [HttpGet("GetTachesById/{id}")]
+        public async Task<object> GetTachesById(string id)
+        {
+            try
+            {
+                var taches = await _context.Taches.Include(x => x.User).Include(x => x.Document).Where(x => x.User.Id == id).ToListAsync();
                 if (taches.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", taches));

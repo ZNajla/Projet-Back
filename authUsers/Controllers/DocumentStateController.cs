@@ -38,7 +38,7 @@ namespace authUsers.Controllers
                         var documentState = new DocumentState()
                         {
                             StateDocument = State.Awaiting,
-                            NumeroState = detail.Step,
+                            StepNumber = detail.Step,
                             Action = detail.Action,
                             Date = DateTime.Now,
                             Comment = "",
@@ -50,7 +50,7 @@ namespace authUsers.Controllers
                     }
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document State has been added successfully", null));
                 }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", typeDoc));
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
             catch (Exception ex)
             {
@@ -77,6 +77,26 @@ namespace authUsers.Controllers
             }
         }
 
+        // GET api/<DocumentStateController>
+        [HttpGet("GetDocumentStateById/{IdUser}")]
+        public async Task<object> GetDocumentStateById(string IdUser)
+        {
+            try
+            {
+                var docState = _context.DocumentState.Where(u => u.UserId == IdUser).Include(u => u.Document).ToList();
+                if (docState != null)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docState));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+
         //PUT api/<DocumentStateController>/5
         [HttpPut("UpdateStatue/{idDoc}")]
          public async Task<object> UpdateStatue(string idDoc, [FromBody] AddUpdateDocState docStatue)
@@ -89,7 +109,7 @@ namespace authUsers.Controllers
                 {
                     if(docStatue.StepNumber == docStates.Count)
                     {
-                        var step = docStates.Find(x => x.NumeroState == docStatue.StepNumber);
+                        var step = docStates.Find(x => x.StepNumber == docStatue.StepNumber);
                         if (docStatue.StateDocument == State.Validated)
                         {
                             doc.DateUpdate = DateTime.Now;
@@ -110,7 +130,7 @@ namespace authUsers.Controllers
                     }
                     if(docStatue.StepNumber != docStates.Count)
                     {
-                        var step = docStates.Find(x => x.NumeroState == docStatue.StepNumber);
+                        var step = docStates.Find(x => x.StepNumber == docStatue.StepNumber);
                         if(step != null)
                         {
                             if (docStatue.StateDocument == State.Validated)

@@ -9,10 +9,6 @@ namespace Application.Models.Entitys
 
         public int Step { get; set; }
 
-        public string Etat { get; set; }
-
-        public string Commentaire { get; set; }
-
         public string UserId { get; set; }
         public User User { get; set; }
 

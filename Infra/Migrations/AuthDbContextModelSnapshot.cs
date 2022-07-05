@@ -31,14 +31,6 @@ namespace Infra.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Commentaire")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Etat")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<int>("Step")
                         .HasColumnType("int");
 
@@ -125,10 +117,10 @@ namespace Infra.Migrations
                     b.Property<Guid>("DocumentId")
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("NumeroState")
+                    b.Property<int>("StateDocument")
                         .HasColumnType("int");
 
-                    b.Property<int>("StateDocument")
+                    b.Property<int>("StepNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -223,6 +215,9 @@ namespace Infra.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -234,7 +229,26 @@ namespace Infra.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("Facebook")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Google")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("LastTimeLogedIn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Linkedin")
                         .IsRequired()
                         .HasColumnType("longtext");
 

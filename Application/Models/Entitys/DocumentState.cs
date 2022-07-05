@@ -10,7 +10,7 @@ namespace Application.Models.Entitys
 
         public State StateDocument { get; set; }
 
-        public int NumeroState { get; set; }
+        public int StepNumber { get; set; }
 
         public string Action { get; set; }
 
