@@ -9,14 +9,12 @@ namespace Application.Models.Request
 {
     public class AddUpdateDocState
     {
-        public State StateDocument { get; set; }
-
-        public DateTime Date { get; set; }
+        public int StateDocument { get; set; }
 
         public string Comment { get; set; }
 
         public int StepNumber { get; set; }
 
-        public string Action { get; set; }
+        public string DocId { get; set; }
     }
 }

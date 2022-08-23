@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Application.Models.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Application.Models.Entitys
 {
@@ -8,6 +9,8 @@ namespace Application.Models.Entitys
         public Guid ID { get; set; }
 
         public string Action { get; set; }
+
+        public State Etat { get; set; }
 
         public DateTime DateCreation { get; set; }
 

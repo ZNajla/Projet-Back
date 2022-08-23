@@ -8,6 +8,8 @@ namespace Application.Models.Entitys
         public string FullName { get; set; } = String.Empty;
         public string Adresse { get; set; } = String.Empty;
         public string Gender { get; set; } = String.Empty;
+        public string Position { get; set; } = String.Empty;
+        public string Function { get; set; } = String.Empty;
         public DateTime BirthDate { get; set; }
         public string Facebook { get; set; } = String.Empty;
         public string Google { get; set; } = String.Empty;

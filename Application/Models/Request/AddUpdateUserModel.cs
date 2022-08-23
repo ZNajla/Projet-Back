@@ -14,6 +14,10 @@
 
         public string Gender { get; set; }
 
+        public string Position { get; set; }
+
+        public string Function { get; set; }
+
         public DateTime BirthDate { get; set; }
 
         public string Facebook { get; set; }

@@ -64,7 +64,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var docState = _context.DocumentState.Where(u => u.DocumentId.ToString().Equals(docId)).ToList();
+                var docState = _context.DocumentState.OrderBy(u => u.StepNumber).Where(u => u.DocumentId.ToString().Equals(docId)).ToList();
                 if (docState != null)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docState));
@@ -98,67 +98,81 @@ namespace authUsers.Controllers
 
 
         //PUT api/<DocumentStateController>/5
-        [HttpPut("UpdateStatue/{idDoc}")]
-         public async Task<object> UpdateStatue(string idDoc, [FromBody] AddUpdateDocState docStatue)
+        [HttpPut("UpdateStatue/{idTask}")]
+         public async Task<object> UpdateStatue(string idTask, [FromBody] AddUpdateDocState docStatue)
          {
             try
             {
-                var doc = await _context.Documents.FirstOrDefaultAsync(u => u.ID.ToString().Equals(idDoc));
-                List<DocumentState> docStates = _context.DocumentState.Where(b => b.DocumentId.ToString().Equals(idDoc)).ToList();
-                if(docStates.Count != 0)
+                var task = await _context.Taches.Include(t => t.Document).FirstOrDefaultAsync(t => t.ID.ToString().Equals(idTask));
+                if(task != null)
                 {
-                    if(docStatue.StepNumber == docStates.Count)
+                    var doc = _context.Documents.FirstOrDefault(u => u.ID.ToString().Equals(docStatue.DocId));
+                    if(doc != null)
                     {
-                        var step = docStates.Find(x => x.StepNumber == docStatue.StepNumber);
-                        if (docStatue.StateDocument == State.Validated)
+                        List<DocumentState> docStates = _context.DocumentState.Where(b => b.DocumentId.ToString().Equals(docStatue.DocId)).ToList();
+                        if (docStates.Count != 0)
                         {
-                            doc.DateUpdate = DateTime.Now;
-                            doc.CurrentState = State.Validated;
-                            doc.CurrentNumberState++;
+                            if (docStatue.StepNumber == docStates.Count)
+                            {
+                                var step = docStates.Find(x => x.StepNumber == docStatue.StepNumber);
+                                if (docStatue.StateDocument == 3)
+                                {
+                                    doc.DateUpdate = DateTime.Now;
+                                    doc.CurrentState = State.Validated;
+                                    doc.CurrentNumberState++;
+                                    step.StateDocument = State.Validated;
+                                    task.Etat = State.Validated;
+                                }
+                                if (docStatue.StateDocument == 4)
+                                {
+                                    doc.DateUpdate = DateTime.Now;
+                                    doc.CurrentState = State.Cancelled;
+                                    doc.CurrentNumberState++;
+                                    step.StateDocument = State.Cancelled;
+                                    task.Etat = State.Cancelled;
+                                }
+                                step.Comment = docStatue.Comment;
+                                step.Date = DateTime.Now;
+                                await _context.SaveChangesAsync();
+                                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been " + docStatue.StateDocument, null));
+                            }
+                            if (docStatue.StepNumber != docStates.Count)
+                            {
+                                var step = docStates.Find(x => x.StepNumber == docStatue.StepNumber);
+                                if (step != null)
+                                {
+                                    if (docStatue.StateDocument == 3)
+                                    {
+                                        doc.DateUpdate = DateTime.Now;
+                                        doc.CurrentState = State.In_Progress;
+                                        doc.CurrentNumberState++;
+                                        step.StateDocument = State.Validated;
+                                        step.Comment = docStatue.Comment;
+                                        step.Date = DateTime.Now;
+                                        task.Etat = State.Validated;
+                                        await _context.SaveChangesAsync();
+                                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document State In Progress ", null));
+                                    }
+                                    if (docStatue.StateDocument == 4)
+                                    {
+                                        doc.DateUpdate = DateTime.Now;
+                                        doc.CurrentState = State.Cancelled;
+                                        doc.CurrentNumberState++;
+                                        step.StateDocument = State.Cancelled;
+                                        step.Comment = docStatue.Comment;
+                                        step.Date = DateTime.Now;
+                                        task.Etat = State.Cancelled;
+                                        await _context.SaveChangesAsync();
+                                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been rejected ", null));
+                                    }
+                                }
+                            }
                         }
-                        if(docStatue.StateDocument == State.Cancelled)
-                        {
-                            doc.DateUpdate = DateTime.Now;
-                            doc.CurrentState = State.Cancelled;
-                            doc.CurrentNumberState++;
-                        }
-                        step.StateDocument = docStatue.StateDocument;
-                        step.Comment = docStatue.Comment;
-                        step.Date = docStatue.Date;
-                        await _context.SaveChangesAsync();
-                        return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been "+docStatue.StateDocument, null));
+                        return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
                     }
-                    if(docStatue.StepNumber != docStates.Count)
-                    {
-                        var step = docStates.Find(x => x.StepNumber == docStatue.StepNumber);
-                        if(step != null)
-                        {
-                            if (docStatue.StateDocument == State.Validated)
-                            {
-                                doc.DateUpdate = DateTime.Now;
-                                doc.CurrentState = State.In_Progress;
-                                doc.CurrentNumberState++;
-                                step.StateDocument = docStatue.StateDocument;
-                                step.Comment = docStatue.Comment;
-                                step.Date = docStatue.Date;
-                                await _context.SaveChangesAsync();
-                                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document State In Progress ", null));
-                            }
-                            if (docStatue.StateDocument == State.Cancelled)
-                            {
-                                doc.DateUpdate = DateTime.Now;
-                                doc.CurrentState = State.Cancelled;
-                                doc.CurrentNumberState++;
-                                step.StateDocument = docStatue.StateDocument;
-                                step.Comment = docStatue.Comment;
-                                step.Date = docStatue.Date;
-                                await _context.SaveChangesAsync();
-                                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been rejected ", null));
-                            }
-                        }
-                    } 
+                    return await Task.FromResult(new ResponseModel(ResponseCode.Error, "document null", null));
                 }
-                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Task null", null));
             }
             catch (Exception ex)
             {

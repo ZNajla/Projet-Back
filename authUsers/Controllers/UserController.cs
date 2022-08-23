@@ -52,7 +52,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var user = new User() { FullName = model.FullName, Email = model.Email, UserName = model.UserName , Adresse = model.Adresse, PhoneNumber = model.PhoneNumber , Gender = model.Gender , BirthDate = model.BirthDate , Facebook = model.Facebook , Google = model.Google , Linkedin = model.Linkedin , LastTimeLogedIn = model.LastTimeLogedIn};
+                var user = new User() { FullName = model.FullName, Email = model.Email, UserName = model.UserName , Adresse = model.Adresse, PhoneNumber = model.PhoneNumber , Gender = model.Gender , BirthDate = model.BirthDate , Facebook = model.Facebook , Google = model.Google , Linkedin = model.Linkedin , LastTimeLogedIn = model.LastTimeLogedIn , Function = model.Function , Position = model.Position};
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -88,7 +88,7 @@ namespace authUsers.Controllers
                         {
                             var appUser = await _userManager.FindByNameAsync(userEmail.UserName);
                             var role = (await _userManager.GetRolesAsync(appUser)).FirstOrDefault();
-                            var user = new UserDTO(appUser.Id, appUser.FullName, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.Adresse, appUser.Gender, appUser.BirthDate, appUser.Facebook, appUser.Google, appUser.Linkedin, appUser.LastTimeLogedIn, role);
+                            var user = new UserDTO(appUser.Id, appUser.FullName, appUser.UserName, appUser.Email, appUser.PhoneNumber, appUser.Adresse, appUser.Gender, appUser.Position , appUser.Function , appUser.BirthDate, appUser.Facebook, appUser.Google, appUser.Linkedin, appUser.LastTimeLogedIn, role);
                             user.Token = GenerateToken(appUser, role);
                             return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", user));
                         }
@@ -118,7 +118,7 @@ namespace authUsers.Controllers
                     var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                     if (role != "Admin")
                     {
-                        allUserDTO.Add(new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender, user.BirthDate, user.Facebook, user.Google, user.Linkedin, user.LastTimeLogedIn, role));
+                        allUserDTO.Add(new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender , user.Position , user.Function , user.BirthDate, user.Facebook, user.Google, user.Linkedin, user.LastTimeLogedIn, role));
                     }
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allUserDTO));
@@ -129,7 +129,7 @@ namespace authUsers.Controllers
             }
         }
 
-        [Authorize]
+       // [Authorize(Roles = "Admin")]
         [HttpGet("GetUserById/{id}")]
         public async Task<object> GetUserById(string id)
         {
@@ -139,7 +139,7 @@ namespace authUsers.Controllers
                 if(user != null)
                 {
                     var roles = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-                    var newUser = new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender, user.BirthDate, user.Facebook, user.Google, user.Linkedin, user.LastTimeLogedIn, roles);
+                    var newUser = new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender, user.Position , user.Function , user.BirthDate, user.Facebook, user.Google, user.Linkedin, user.LastTimeLogedIn, roles);
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", newUser));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
@@ -150,7 +150,7 @@ namespace authUsers.Controllers
             }
         }
 
-       // [Authorize]
+        //[Authorize(Roles = "Admin")]
         [HttpPut("UpdateUser/{id}")]
         public async Task<object> UpdateUser(string id, [FromBody] AddUpdateUserModel model)
         {
@@ -176,7 +176,7 @@ namespace authUsers.Controllers
                     user.Linkedin = model.Linkedin;
                     await _userManager.AddToRoleAsync(user, model.Role);
                     await _userManager.UpdateAsync(user);
-                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User has been updated", null));
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "User has been updated", user));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }

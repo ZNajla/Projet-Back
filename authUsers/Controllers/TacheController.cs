@@ -43,6 +43,7 @@ namespace authUsers.Controllers
                             var tache = new Tache()
                             {
                                 Action = currentState.Action,
+                                Etat = State.Awaiting,
                                 DateCreation = DateTime.Now,
                                 User = currentState.User,
                                 Document = document,
@@ -75,6 +76,7 @@ namespace authUsers.Controllers
                    var tach = new Tache()
                    {
                         Action = tache.Action,
+                        Etat = State.Awaiting,
                         DateCreation = tache.DateCreation,
                         User = user,    
                         Document = doc,
@@ -110,17 +112,35 @@ namespace authUsers.Controllers
             }
         }
 
-        [HttpGet("GetTachesById/{id}")]
-        public async Task<object> GetTachesById(string id)
+        [HttpGet("GetTachesByUserId/{userId}")]
+        public async Task<object> GetTachesByUserId(string userId)
         {
             try
             {
-                var taches = await _context.Taches.Include(x => x.User).Include(x => x.Document).Where(x => x.User.Id == id).ToListAsync();
+                var taches = await _context.Taches.Include(x => x.User).Include(x => x.Document).Include(x => x.Document.User).Where(x => x.User.Id == userId).ToListAsync();
                 if (taches.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", taches));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        [HttpGet("GetTachesById/{id}")]
+        public async Task<object> GetTachesById(string id)
+        {
+            try
+            {
+                var tache = await _context.Taches.Include(x => x.User).Include(x => x.Document).Include(x => x.Document.User).FirstOrDefaultAsync(x => x.ID.ToString().Equals(id));
+                if (tache != null)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", tache));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Something wrong", null));
             }
             catch (Exception ex)
             {

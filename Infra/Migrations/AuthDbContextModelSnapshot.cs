@@ -171,6 +171,9 @@ namespace Infra.Migrations
                     b.Property<Guid>("DocumentID")
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("Etat")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
 
@@ -284,6 +287,14 @@ namespace Infra.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
+
+                    b.Property<string>("function")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("position")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 

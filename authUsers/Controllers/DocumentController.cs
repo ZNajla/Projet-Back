@@ -85,8 +85,6 @@ namespace authUsers.Controllers
                         var entries = await _context.SaveChangesAsync();
                         return await Task.FromResult(new ResponseModel(ResponseCode.OK, "Document has been added successfully", document.ID));
                     }
-                    
-                    
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.Error, "Something went wrong please try again", null));
             }
@@ -102,7 +100,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var document = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).ToListAsync();
+                var document = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).OrderByDescending(b => b.Date).ToListAsync();
                 if(document.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", document));
@@ -121,7 +119,46 @@ namespace authUsers.Controllers
         {
             try
             {
-                var docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).Where(u => u.CurrentState.Equals(state)).ToList();
+                List<Document> docList = new List<Document>();
+                if (state == "Validated")
+                {
+                    docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).OrderByDescending(u => u.Date).Where(u => u.CurrentState.Equals(State.Validated)).ToList();
+                }
+                if (state == "In Progress")
+                {
+                    docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).OrderByDescending(u => u.Date).Where(u => u.CurrentState.Equals(State.In_Progress)).ToList();
+                }
+                if (state == "Draft")
+                {
+                    docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).OrderByDescending(u => u.Date).Where(u => u.CurrentState.Equals(State.draft)).ToList();
+                }
+                if (state == "Rejected")
+                {
+                    docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).OrderByDescending(u => u.Date).Where(u => u.CurrentState.Equals(State.Cancelled)).ToList();
+                }
+                if (state == "Awaiting")
+                {
+                    docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).OrderByDescending(u => u.Date).Where(u => u.CurrentState.Equals(State.Awaiting)).ToList();
+                }
+                if (docList.Count != 0)
+                {
+                    return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docList));
+                }
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, "there is no document with that state", null));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new ResponseModel(ResponseCode.Error, ex.Message, null));
+            }
+        }
+
+        // GET: api/<DocumentController>
+        [HttpGet("GetValidatedDocument")]
+        public async Task<object> GetValidatedDocument()
+        {
+            try
+            {
+                var docList = _context.Documents.Include(u => u.DocumentStates).Include(u => u.Types).Include(u => u.User).OrderByDescending(u => u.Date).Where(u => u.CurrentState.Equals(3)).ToList();
                 if (docList.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", docList));
@@ -159,7 +196,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).Where(b => b.User.Id == id).ToListAsync();
+                var doc = await _context.Documents.Include(b => b.User).Include(b => b.Types).Include(b => b.DocumentStates).OrderByDescending(b => b.Date).Where(b => b.User.Id == id).ToListAsync();
                 if (doc.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", doc));

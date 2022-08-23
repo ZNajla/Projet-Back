@@ -120,7 +120,7 @@ namespace authUsers.Controllers
                     var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                     if (role == name)
                     {
-                        allUserDTO.Add(new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender ,  user.BirthDate, user.Facebook , user.Google , user.Linkedin , user.LastTimeLogedIn ,role));
+                        allUserDTO.Add(new UserDTO(user.Id, user.FullName, user.UserName, user.Email, user.PhoneNumber, user.Adresse, user.Gender ,user.Position , user.Function ,  user.BirthDate, user.Facebook , user.Google , user.Linkedin , user.LastTimeLogedIn ,role));
                     }
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", allUserDTO));
