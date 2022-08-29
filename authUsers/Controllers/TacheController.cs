@@ -117,7 +117,7 @@ namespace authUsers.Controllers
         {
             try
             {
-                var taches = await _context.Taches.Include(x => x.User).Include(x => x.Document).Include(x => x.Document.User).Where(x => x.User.Id == userId).ToListAsync();
+                var taches = await _context.Taches.Include(x => x.User).Include(x => x.Document).Include(x => x.Document.User).OrderByDescending(x => x.DateCreation).Where(x => x.User.Id == userId).ToListAsync();
                 if (taches.Count != 0)
                 {
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", taches));

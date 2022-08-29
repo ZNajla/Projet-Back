@@ -6,6 +6,7 @@ using Application.Models.Responce;
 using Infra.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 
@@ -295,5 +296,38 @@ namespace authUsers.Controllers
             }
         }
 
+        [HttpGet("Download/{id}")]
+        public async Task<ActionResult> Download(string id)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            var document = await _context.Documents.FirstOrDefaultAsync(x => x.ID.ToString().Equals(id));
+
+            if(document == null)
+            {
+                return NotFound();
+            }
+
+            var file = Path.Combine(Directory.GetCurrentDirectory(), "Uploaded Files", document.Titre);
+
+            string contentType;
+
+            if(!provider.TryGetContentType(file, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+
+            byte[] fileBytes;
+
+            if (System.IO.File.Exists(file))
+            {
+                fileBytes = System.IO.File.ReadAllBytes(file);
+            }
+            else
+            {
+                return NotFound();
+            }
+
+            return File(fileBytes, contentType, document.Titre);
+        }
     }
 }

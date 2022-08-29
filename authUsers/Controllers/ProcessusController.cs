@@ -62,11 +62,6 @@ namespace authUsers.Controllers
                 var processus = await _context.Processus.Include(b => b.Detail_Processus).ToListAsync();
                 if (processus.Count != 0)
                 {
-                    foreach (Processus pro in processus)
-                    {
-                        var proc = new ProcessusDTO(pro.NomProcessus,pro.Description);
-                        allProcessus.Add(proc);
-                    }
                     return await Task.FromResult(new ResponseModel(ResponseCode.OK, "", processus));
                 }
                 return await Task.FromResult(new ResponseModel(ResponseCode.OK, "there is no data in the table", allProcessus));
